@@ -531,6 +531,92 @@
 	. = ..()
 	chameleon_action.emp_randomise(INFINITY)
 
+/obj/item/clothing/under/plasmaman/chameleon
+	name = "plasma envirosuit"
+	icon = 'icons/obj/clothing/species/plasmaman/uniform.dmi'
+	icon_state = "plasmaman"
+	item_state = "plasmaman"
+	item_color = "plasmaman"
+	desc = "A special containment suit that allows plasma-based lifeforms to exist safely in an oxygenated environment, and automatically extinguishes them in a crisis. \
+			Despite being airtight, it's not spaceworthy. It has a small dial on the wrist."
+	armor = list(MELEE = 5, BULLET = 5, LASER = 5, ENERGY = 0, BOMB = 0, RAD = 0, FIRE = INFINITY, ACID = INFINITY)
+	sensor_mode = SENSOR_OFF
+	random_sensor = FALSE
+
+	var/datum/action/item_action/chameleon/change/chameleon_action
+
+/obj/item/clothing/under/plasmaman/chameleon/Initialize(mapload)
+	. = ..()
+	chameleon_action = new(src)
+	chameleon_action.chameleon_type = /obj/item/clothing/under
+	chameleon_action.chameleon_name = "Jumpsuit"
+	chameleon_action.chameleon_blacklist = typecacheof(list(
+		/obj/item/clothing/under,
+		/obj/item/clothing/under/misc,
+		/obj/item/clothing/under/dress,
+		/obj/item/clothing/under/pants,
+		/obj/item/clothing/under/color,
+		/obj/item/clothing/under/retro,
+		/obj/item/clothing/under/solgov,
+		/obj/item/clothing/under/suit,
+		/obj/item/clothing/under/costume,
+		/obj/item/clothing/under/rank,
+		/obj/item/clothing/under/rank/cargo,
+		/obj/item/clothing/under/rank/civilian,
+		/obj/item/clothing/under/rank/engineering,
+		/obj/item/clothing/under/rank/medical,
+		/obj/item/clothing/under/rank/rnd,
+		/obj/item/clothing/under/rank/security,
+		), only_root_path = TRUE)
+	chameleon_action.initialize_disguises()
+
+/obj/item/clothing/under/plasmaman/chameleon/Destroy()
+	QDEL_NULL(chameleon_action)
+	return ..()
+
+/obj/item/clothing/under/plasmaman/chameleon/emp_act(severity)
+	. = ..()
+	chameleon_action.emp_randomise()
+
+/obj/item/clothing/under/plasmaman/chameleon/broken/Initialize(mapload)
+	. = ..()
+	chameleon_action.emp_randomise(INFINITY)
+
+/obj/item/clothing/mask/gas/plasmaman/chameleon
+	name = "plasma environment cowl"
+	desc = "A special airtight cowl for allowing plasma-based lifeforms to wear standard hats in lieu of an envirosuit helmet. It seems very good for hiding your identity."
+	icon_state = "balaclava"
+	item_state = "balaclava"
+	armor = list(MELEE = 5, BULLET = 5, LASER = 5, ENERGY = 0, BOMB = 0, RAD = 0, FIRE = INFINITY, ACID = 50)
+
+	var/obj/item/voice_changer/voice_changer
+
+	var/datum/action/item_action/chameleon/change/chameleon_action
+
+/obj/item/clothing/mask/gas/plasmaman/chameleon/Initialize(mapload)
+	. = ..()
+
+	chameleon_action = new(src)
+	chameleon_action.chameleon_type = /obj/item/clothing/mask
+	chameleon_action.chameleon_name = "Mask"
+	chameleon_action.chameleon_blacklist = list()
+	chameleon_action.initialize_disguises()
+
+	voice_changer = new(src)
+
+/obj/item/clothing/mask/gas/plasmaman/chameleon/Destroy()
+	QDEL_NULL(voice_changer)
+	QDEL_NULL(chameleon_action)
+	return ..()
+
+/obj/item/clothing/mask/gas/plasmaman/chameleon/emp_act(severity)
+	. = ..()
+	chameleon_action.emp_randomise()
+
+/obj/item/clothing/mask/gas/plasmaman/chameleon/broken/Initialize(mapload)
+	. = ..()
+	chameleon_action.emp_randomise(INFINITY)
+
 /obj/item/storage/backpack/chameleon
 	name = "backpack"
 

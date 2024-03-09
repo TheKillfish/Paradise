@@ -249,6 +249,22 @@
 	armor = list(MELEE = 35, BULLET = 20, LASER = 20, ENERGY = 5, BOMB = 15, RAD = 0, FIRE = 10, ACID = 50)
 	strip_delay = 6 SECONDS
 
+/obj/item/clothing/mask/gas/plasmaman
+	name = "plasma environment cowl"
+	desc = "A special airtight cowl for allowing plasma-based lifeforms to wear standard hats in lieu of an envirosuit helmet."
+	icon_state = "balaclava"
+	armor = list(MELEE = 0, BULLET = 0, LASER = 0, ENERGY = 0, BOMB = 0, RAD = 0, FIRE = INFINITY, ACID = 50)
+	species_restricted = list("Plasmaman")
+	strip_delay = 60
+
+/obj/item/clothing/mask/gas/plasmaman/equipped(mob/user, slot, initial)
+	. = ..()
+	ADD_TRAIT(user, TRAIT_NOSELFIGNITION_HEAD_ONLY, "plasmaman mask")
+
+/obj/item/clothing/mask/gas/plasmaman/dropped(mob/user, slot, initial)
+	.=..()
+	REMOVE_TRAIT(user, TRAIT_NOSELFIGNITION_HEAD_ONLY, "plasmaman mask")
+
 // ********************************************************************
 
 // **** Security gas mask ****
