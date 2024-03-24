@@ -10,7 +10,6 @@
 	though they are tentatively re-establishing relations with other galactic powers, even after the crumbling of their once powerful empire."
 	unarmed_type = /datum/unarmed_attack/claws
 
-	brute_mod = 0.8
 	hunger_drain = 0.15
 	tox_mod = 1.7
 

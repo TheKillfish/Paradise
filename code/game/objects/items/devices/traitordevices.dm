@@ -430,3 +430,28 @@
 	GLOB.mirrors -= src
 	QDEL_NULL(appearance_changer_holder)
 	return ..()
+
+/obj/item/fortress_injector
+	name = "fortress injector"
+	desc = "A specialized nanite swarm that hardens Kidan exoskeletons into robust natural armor, allegedly making them similar to the long extinct Fortress caste."
+	icon = 'icons/obj/hypo.dmi'
+	icon_state = "combat_hypo"
+	var/used = FALSE
+
+/obj/item/fortress_injector/attack_self(mob/living/user)
+	if(user.mind && (ischangeling(user) || user.mind.has_antag_datum(/datum/antagonist/vampire)) || (user.dna && user.dna.species.name != "Kidan"))
+		to_chat(user, "<span class='warning'>The injector is not compatable with your biology!</span>")
+		return
+	if(used)
+		to_chat(user, "<span class='notice'>The injector is empty!</span>")
+		return
+	used = TRUE // Set this BEFORE the popup to prevent people using the injector more than once.
+	var/choice = tgui_alert(user, "The injector is still unused. Do you wish to use it?", "Fortress injector", list("Yes", "No"))
+	if(choice != "Yes")
+		to_chat(user, "<span class='notice'>You decide against using [src].</span>")
+		used = FALSE
+		return
+	to_chat(user, "<span class='notice'>You inject yourself with the nanites!</span>")
+	for()
+
+armor = list(MELEE = 10, BULLET = 10, LASER = 10, ENERGY = 0, BOMB = 20, RAD = 0, FIRE = 0, ACID = 0)
