@@ -226,6 +226,8 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 #define TRAIT_MEPHEDRONE_ADAPTED "mephedrone_adapted" // Trait that changes the ending effects of twitch leaving your system
 #define TRAIT_NOKNOCKDOWNSLOWDOWN "noknockdownslowdown" //If this person has this trait, they are not slowed via knockdown, but they can be hit by bullets like a self knockdown
 #define TRAIT_CAN_STRIP "can_strip" // This mob can strip other mobs.
+#define TRAIT_WEAK_TABLE_LEAP "weak_table_leap" // Lets mob mount tables notably faster but not faster than bartender or chef
+#define TRAIT_MID_TABLE_LEAP "mid_table_leap" // Improved version of weak_table_leap, but still not faster than bartender or chef
 
 //***** MIND TRAITS *****/
 #define TRAIT_HOLY "is_holy" // The mob is holy in regards to religion
