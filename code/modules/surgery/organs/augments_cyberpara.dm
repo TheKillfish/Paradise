@@ -1,7 +1,7 @@
 // Quick to-do list:
 // - Orwell-Allans neothalamic system: Yoink Qani-Laaca code, remember to make Trechodrone and other datums
 // - Savage knuckleblades: Generic bladed wepon cybernetic
-// - Leap balancer: Not sure how to handle the first leg implants, but this will make you vault onto things faster like Chef/Bartender, one being 1/3 speed and two being 2/3
+// - Leap balancer: DONE
 // - Leap enhancer: Ditto with balancer in terms of how the fuck it'll work, but make it do the same as mining boots with visuals of DNA leap, with wallbonk
 // - Cyberear audio recorder: Tape recorder but in your ears that can transfer to normal tape recorder, takes more damage from stuff that cause hearing damage
 // - Limited auto-translator: Be able to understand a list of languages, needing to change which one each time, maybe makes you temporarily unable to understand anyone on EMP

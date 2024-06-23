@@ -457,6 +457,34 @@
 	action_icon = list(/datum/action/item_action/organ_action/toggle = 'icons/obj/janitor.dmi')
 	action_icon_state = list(/datum/action/item_action/organ_action/toggle = "advmop")
 
+// Savage claw implant, generic knuckleknives. Who can say no to Wolverine?
+
+/obj/item/melee/savageclaw
+	name = "savage knuckleblade"
+	desc = "A trio of simple, straightforward blades that extend from your mid forearm and go past your knuckles. \
+		Definitely going to ruin someone's day BADLY, but will have a slightly harder time against armor."
+	icon = 'icons/obj/weapons/melee.dmi'
+	righthand_file = 'icons/mob/inhands/weapons_righthand.dmi'
+	lefthand_file = 'icons/mob/inhands/weapons_lefthand.dmi'
+	icon_state = "rapier"
+	item_state = "rapier"
+	w_class = WEIGHT_CLASS_BULKY
+	sharp = TRUE
+	force = 20
+	armour_penetration_percentage = -50
+	hitsound = 'sound/weapons/slice.ogg'
+	attack_verb = list("slashes", "slices", "rends", "eviscerates")
+
+/obj/item/organ/internal/cyberimp/arm/savageclaw
+	name = "savage knuckeblade implant"
+	desc = "Robust, integrated blades installed into your forearm that extend past your knuckles."
+	contents = newlist(/obj/item/melee/savageclaw)
+	icon_state = "rapier"
+	action_icon = list(/datum/action/item_action/organ_action/toggle = 'icons/obj/surgery.dmi')
+	action_icon_state = list(/datum/action/item_action/organ_action/toggle = "rapier")
+	origin_tech = "combat=5;biotech=5;syndicate=2"
+	stealth_level = 1 // Hidden from health analyzers
+
 // Razorwire implant, long reach whip made of extremely thin wire, ouch!
 
 /obj/item/melee/razorwire
