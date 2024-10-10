@@ -2858,6 +2858,7 @@
 #include "code\modules\surgery\organs\augments_arms.dm"
 #include "code\modules\surgery\organs\augments_eyes.dm"
 #include "code\modules\surgery\organs\augments_internal.dm"
+#include "code\modules\surgery\organs\augments_legs.dm"
 #include "code\modules\surgery\organs\autosurgeon.dm"
 #include "code\modules\surgery\organs\blood.dm"
 #include "code\modules\surgery\organs\body_egg.dm"

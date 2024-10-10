@@ -583,6 +583,22 @@
 		to_chat(owner, "<span class='warning'>Your breathing tube suddenly closes!</span>")
 		owner.AdjustLoseBreath(4 SECONDS)
 
+/obj/item/organ/internal/cyberimp/mouth/taste_interpreter
+	name = "taste interpreter"
+	desc = "A set of artificial taste receptors installed in the mouth area, providing an enhanced sense of taste"
+	icon_state = "implant_mask"
+	slot = "taste_buds"
+	w_class = WEIGHT_CLASS_TINY
+	origin_tech = "materials=2;biotech=3"
+
+/obj/item/organ/internal/cyberimp/mouth/taste_interpreter/insert(mob/living/carbon/M, special = FALSE)
+	. = ..()
+	ADD_TRAIT(M, TRAIT_FAKETASTE, "taste interpreter")
+
+obj/item/organ/internal/cyberimp/mouth/taste_interpreter/remove(mob/living/carbon/M, special = FALSE)
+	. = ..()
+	REMOVE_TRAIT(M, TRAIT_FAKETASTE, "taste interpreter")
+
 //[[[[CHEST]]]]
 /obj/item/organ/internal/cyberimp/chest
 	name = "cybernetic torso implant"

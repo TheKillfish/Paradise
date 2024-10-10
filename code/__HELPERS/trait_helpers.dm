@@ -237,6 +237,10 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 #define TRAIT_NPC_ZOMBIE "npc_zombie" // A trait for checking if a zombie should act like an NPC and attack
 #define TRAIT_ABSTRACT_HANDS "abstract_hands" // Mobs with this trait can only pick up abstract items.
 #define TRAIT_LANGUAGE_LOCKED "language_locked" // cant add/remove languages until removed (excludes babel because fuck everything i guess)
+#define TRAIT_WEAK_TABLE_LEAP "weak_table_leap" // Lets mob mount tables faster than normal but not nearly as normal table_leap
+#define TRAIT_MID_TABLE_LEAP "mid_table_leap" // Improved version of weak_table_leap, but still not faster than table_leap
+#define TRAIT_TRECHODRONE_ADAPTED "trechodrone_adapted" // Much like mephedrone_adapted but for trechodrone
+#define TRAIT_FAKETASTE "faketaste" // A trait that overrides normal taste sensitivity
 
 //***** MIND TRAITS *****/
 #define TRAIT_HOLY "is_holy" // The mob is holy in regards to religion

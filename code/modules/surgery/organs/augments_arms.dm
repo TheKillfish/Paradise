@@ -833,3 +833,84 @@
 	if(emp_proof)
 		return
 	muscle_implant.emp_act(severity, owner)
+
+// Jensen implanted longblade, a normal sword-type weapon able to parry (not efficiently) installed in your arm. Comes in Mantis Blade flavour, exchanging parry for % Armor Penetration!
+
+/obj/item/melee/jensen_longblade
+	name = "Jensen longblade"
+	desc = "A simple bladed weapon reminiscent of a sword. \
+	Capable of parrying, however it's smaller size and the fact this weapon juts out of your forearm rather than sitting in your hand makes it a bit harder."
+	icon = 'icons/obj/weapons/melee.dmi'
+	righthand_file = 'icons/mob/inhands/weapons_righthand.dmi'
+	lefthand_file = 'icons/mob/inhands/weapons_lefthand.dmi'
+	icon_state = "rapier"
+	item_state = "rapier"
+	w_class = WEIGHT_CLASS_BULKY
+	sharp = TRUE
+	force = 20
+	hitsound = 'sound/weapons/swordhit.ogg'
+	attack_verb = list("slashes", "slices", "rends", "eviscerates")
+
+/obj/item/melee/mantis_longblade
+	name = "Mantis longblade"
+	desc = "A more complicated variant of cybernetic longblade, reminiscent of mantis' foreleg. \
+	Though incapable of parrying due to the more delicate mechanics involved in making it mantis-like, it instead excels at penetrating armor."
+	icon = 'icons/obj/weapons/melee.dmi'
+	righthand_file = 'icons/mob/inhands/weapons_righthand.dmi'
+	lefthand_file = 'icons/mob/inhands/weapons_lefthand.dmi'
+	icon_state = "rapier"
+	item_state = "rapier"
+	w_class = WEIGHT_CLASS_BULKY
+	sharp = TRUE
+	force = 20
+	armour_penetration_percentage = -50
+	hitsound = 'sound/weapons/rapierhit.ogg'
+	attack_verb = list("slashes", "slices", "rends", "eviscerates")
+
+/obj/item/organ/internal/cyberimp/arm/longblade
+	name = "Jensen longblade implant"
+	desc = "A stout sword-like blade installed into your forearm."
+	contents = newlist(/obj/item/melee/jensen_longblade)
+	icon_state = "rapier"
+	action_icon = list(/datum/action/item_action/organ_action/toggle = 'icons/obj/surgery.dmi')
+	action_icon_state = list(/datum/action/item_action/organ_action/toggle = "rapier")
+	origin_tech = "combat=5;biotech=5;syndicate=2"
+	stealth_level = 1
+
+/obj/item/organ/internal/cyberimp/arm/longblade/mantis
+	name = "Mantis longblade implant"
+	desc = "A mantis-like retracting blade installed in your forearm."
+	contents = newlist(/obj/item/melee/mantis_longblade)
+	icon_state = "rapier"
+	action_icon = list(/datum/action/item_action/organ_action/toggle = 'icons/obj/surgery.dmi')
+	action_icon_state = list(/datum/action/item_action/organ_action/toggle = "rapier")
+	origin_tech = "combat=5;biotech=5;syndicate=2"
+	stealth_level = 1
+
+// Logan knuckleknives, cause who can say no to Wolverine? Has faster attack speed but struggles against armor.
+
+/obj/item/melee/savageclaw
+	name = "Logan knuckleknives"
+	desc = "A trio of simple, straightforward blades that extend from your mid forearm and go past your knuckles. \
+		Definitely going to ruin someone's day BADLY, but will have a harder time against armor."
+	icon = 'icons/obj/weapons/melee.dmi'
+	righthand_file = 'icons/mob/inhands/weapons_righthand.dmi'
+	lefthand_file = 'icons/mob/inhands/weapons_lefthand.dmi'
+	icon_state = "rapier"
+	item_state = "rapier"
+	w_class = WEIGHT_CLASS_BULKY
+	sharp = TRUE
+	force = 15
+	armour_penetration_percentage = -50
+	hitsound = 'sound/weapons/slice.ogg'
+	attack_verb = list("slashes", "slices", "rends", "eviscerates")
+
+/obj/item/organ/internal/cyberimp/arm/savageclaw
+	name = "savage knuckeblade implant"
+	desc = "Robust, integrated blades installed into your forearm that extend past your knuckles."
+	contents = newlist(/obj/item/melee/savageclaw)
+	icon_state = "rapier"
+	action_icon = list(/datum/action/item_action/organ_action/toggle = 'icons/obj/surgery.dmi')
+	action_icon_state = list(/datum/action/item_action/organ_action/toggle = "rapier")
+	origin_tech = "combat=5;biotech=5;syndicate=2"
+	stealth_level = 1
