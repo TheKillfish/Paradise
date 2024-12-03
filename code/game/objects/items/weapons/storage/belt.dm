@@ -220,7 +220,9 @@
 		/obj/item/handheld_defibrillator,
 		/obj/item/reagent_containers/applicator,
 		/obj/item/geiger_counter,
-		/obj/item/organ_extractor
+		/obj/item/organ_extractor,
+		/obj/item/reagent_scanner,
+		/obj/item/autopsy_scanner
 	)
 
 /obj/item/storage/belt/medical/surgery

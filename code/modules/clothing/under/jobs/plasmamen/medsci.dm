@@ -53,3 +53,10 @@
 	icon_state = "chemist_envirosuit"
 	item_state = "chemist_envirosuit"
 	item_color = "chemist_envirosuit"
+
+/obj/item/clothing/under/plasmaman/coroner
+	name = "mortuary plasma envirosuit"
+	desc = "A plasmaman envirosuit designed for coroners."
+	icon_state = "coroner_envirosuit"
+	item_state = "coroner_envirosuit"
+	item_color = "coroner_envirosuit"

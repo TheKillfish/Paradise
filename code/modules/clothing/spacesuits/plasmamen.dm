@@ -144,6 +144,12 @@
 	icon_state = "chemist_envirohelm"
 	item_state = "chemist_envirohelm"
 
+/obj/item/clothing/head/helmet/space/plasmaman/coroner
+	name = "mortuary plasma envirosuit helmet"
+	desc = "A plasmaman envirohelmet designed for coroners, much like the normal medical helmet but in a somber black."
+	icon_state = "coroner_envirohelm"
+	item_state = "coroner_envirohelm"
+
 /obj/item/clothing/head/helmet/space/plasmaman/science
 	name = "science plasma envirosuit helmet"
 	desc = "A plasmaman envirohelmet designed for scientists."

@@ -112,6 +112,12 @@
 	head = /obj/item/clothing/head/helmet/space/plasmaman/genetics
 	uniform = /obj/item/clothing/under/plasmaman/genetics
 
+/datum/outfit/plasmaman/coroner
+	name = "Plasmaman Morgue"
+
+	head = /obj/item/clothing/head/helmet/space/plasmaman/coroner
+	uniform = /obj/item/clothing/under/plasmaman/coroner
+
 /datum/outfit/plasmaman/science
 	name = "Plasmaman Science"
 
