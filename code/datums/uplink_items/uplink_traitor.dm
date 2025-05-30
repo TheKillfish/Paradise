@@ -624,11 +624,22 @@
 	This spinal implant will inject mephedrone into your system, a powerful stimulant that causes slight heart damage.\
 	This stimulant will provide faster movement speed, slight pain resistance, immunity to crawling slowdown, and faster attack speed, though no antistun.\
 	Overdosing will cause massive heart damage, but will allow the user to dodge bullets for a minute and attack even faster.\
-	Two minute normal uptime, 5 minute cooldown, unlimited uses. Incompatible with the Binyat Wireless Hacking System."
+	Two minute normal uptime, 5 minute cooldown, unlimited uses. Incompatible with the Binyat Wireless Hacking System and the Orwell-Allens Neothalamic System."
 	reference = "QLSC"
 	item = /obj/item/autosurgeon/organ/syndicate/oneuse/sensory_enhancer
 	cost = 40
 	excludefrom = list(UPLINK_TYPE_NUCLEAR, UPLINK_TYPE_SST) //No, nukies do not get to dodge bullets.
+
+/datum/uplink_item/cyber_implants/berserk_processor
+	name = "Orwell-Allens Neothalamic System Autoimplanter"
+	desc = "This spinal implant will inject trechodrone into your system, a powerful synthetic adrenaline that damages your body.\
+	This stimulant will increase your melee damage, decrease stuns, and prevent/resolve heart failure when not in a major critical state.\
+	Overdosing will worsen bodily damage over time, but allows you to force unbolted doors open with your bare hands, increases your stamina recovery and recovery from unconciousness.\
+	Two minute normal uptime, 5 minute cooldown, unlimited uses. Incompatible with the Binyat Wireless Hacking System Qani-Laaca Sensory Computer."
+	reference = "OANS"
+	item = /obj/item/autosurgeon/organ/syndicate/oneuse/berserk_processor
+	cost = 40
+	excludefrom = list(UPLINK_TYPE_NUCLEAR, UPLINK_TYPE_SST) // Also no, nukies do not get pseudo-hulk.
 
 /datum/uplink_item/badass/syndiecards
 	name = "Syndicate Playing Cards"

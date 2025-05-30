@@ -560,6 +560,8 @@
 		return
 	if(user.reagents.get_reagent_amount("mephedrone") > 15) // No patrick, you do not get to be chainsaw stun immune and bullet immune at once
 		return
+	if(user.reagents.get_reagent_amount("trechodrone") > 0) // Also no, you do not get to use psudo-hulk and a chainsaw at the same time, like, at all
+		return
 	if(target.stat != DEAD) //no buff from attacking dead targets
 		user.apply_status_effect(STATUS_EFFECT_CHAINSAW_SLAYING)
 

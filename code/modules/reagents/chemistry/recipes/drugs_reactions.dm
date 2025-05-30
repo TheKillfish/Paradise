@@ -83,6 +83,21 @@
 	fireflash(holder.my_atom, 3, 500)
 	explosion(T, 0, 0, 2, 2, flame_range = 2, cause = "Mephedrone reaction")
 
+/datum/chemical_reaction/trechodrone
+	name = "Trechodrone"
+	id = "trechodrone"
+	result = "trechodrone"
+	required_reagents = list("epinephrine" = 5, "surge" = 5, "amanitin" = 5)
+	result_amount = 10
+	min_temp = T0C + 100
+	mix_message = "The mixture bubbles angrily into a deep red solution that smells of adrenaline."
+	mix_sound = 'sound/goonstation/misc/fuse.ogg'
+
+/datum/chemical_reaction/trechodrone/on_reaction(datum/reagents/holder)
+	var/turf/T = get_turf(holder.my_atom)
+	fireflash(holder.my_atom, 3, 500)
+	explosion(T, 0, 0, 2, 2, flame_range = 2, cause = "Trechodrone reaction")
+
 /datum/chemical_reaction/jenkem
 	name = "Jenkem"
 	id = "jenkem"

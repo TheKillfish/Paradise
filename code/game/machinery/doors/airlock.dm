@@ -803,6 +803,25 @@ GLOBAL_LIST_EMPTY(airlock_emissive_underlays)
 		return // Smack that head against that airlock
 	if(remove_airlock_note(user, FALSE))
 		return
+	if(HAS_TRAIT_FROM(user, TRAIT_FORCE_DOORS, "trechodrone"))
+		if(requiresID() && allowed(user))
+			return ..()
+		prying_so_hard = TRUE
+		var/time_to_open = 0
+		if(arePowerSystemsOn())
+			user.visible_message("<span class='warning'>[user] begins prying open [src] with their bare hands!</span>",\
+								"<span class='warning'>You being prying open [src] with your bare hands!</span>",\
+								"<span class='warning'>You hear groaning metal...</span>")
+			time_to_open = 50
+			playsound(src, 'sound/machines/airlock_alien_prying.ogg', 100, TRUE)
+		else
+			visible_message("<span class='danger'>[user] forces the door!</span>")
+			playsound(loc, "sparks", 100, TRUE, SHORT_RANGE_SOUND_EXTRARANGE)
+
+		if(do_after(user, time_to_open, TRUE, src))
+			if(density && !open(TRUE))
+				to_chat(user, "<span class='warning'>Despite your efforts, [src] managed to resist your attempts to open it!</span>")
+		prying_so_hard = FALSE
 	..()
 
 //Checks if the user can headbutt the airlock and does it if it can. Returns TRUE if it happened

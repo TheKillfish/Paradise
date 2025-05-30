@@ -197,6 +197,9 @@
 	if(!HAS_TRAIT(user, TRAIT_FORCE_DOORS))
 		return FALSE
 
+	if(HAS_TRAIT_FROM(user, TRAIT_FORCE_DOORS, "trechodrone")) // We don't want people just walking into doors to force them open
+		return FALSE
+
 	var/datum/antagonist/vampire/V = user.mind?.has_antag_datum(/datum/antagonist/vampire)
 	if(V && HAS_TRAIT_FROM(user, TRAIT_FORCE_DOORS, VAMPIRE_TRAIT))
 		if(!V.bloodusable)

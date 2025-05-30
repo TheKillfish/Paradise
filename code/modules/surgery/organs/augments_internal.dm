@@ -442,6 +442,132 @@
 	AddElement(/datum/element/shatters_when_thrown, /obj/effect/decal/cleanable/glass, 1, "shatter")
 	transform = transform.Scale(0.75, 0.75)
 
+// An implant that injects you with trechodrone on demand, acting like a bootleg berserk from Cyberpunk
+
+/obj/item/organ/internal/cyberimp/brain/berserk_processor
+	name = "\improper Orwell-Allens neothalamic system"
+	desc = "An experimental implant installed within the neck, just below the skull and close to thalamus of organics. When activated, it can give a temporary boost \
+	to physical capabilities, caused by removing natural limiters on strength exertion related to muscles and hydraulics. Due to its installed location and how it functions, \
+	it is incompatible with systems that heavily affect the nervous system, like the central nervous system rebooter. \
+	As a bonus effect, you are immune to limb breakage caused by trechodrone overexerting the body, as the computer reproccesses electrical and biological signals \
+	to regulate them in order to alleviate damage caused."
+	icon_state = "sandy"
+	implant_overlay = null
+	implant_color = null
+	slot = "brain_antistun"
+	emp_proof = TRUE
+	actions_types = list(/datum/action/item_action/organ_action/toggle/berserk_processor)
+	origin_tech = "combat=6;biotech=6;syndicate=4"
+	///The icon state used for the on mob sprite. Default is sandy. Drask and vox have their own unique sprites
+	var/custom_mob_sprite = "sandy"
+	COOLDOWN_DECLARE(berserk_processor_cooldown)
+
+/obj/item/organ/internal/cyberimp/brain/berserk_processor/rnd
+	emp_proof = FALSE
+
+/obj/item/organ/internal/cyberimp/brain/berserk_processor/examine_more(mob/user)
+	. = ..()
+	. += "<i>Developed by Interdyne Pharmaceuticals as a roughly analagous competitor to Biotech Solutions' Qani-Laaca system, this this equally revolutionary and invasive implant \
+	also uses an integrated chemical synthesizer designed to administer their own drug, Trechodrone: a highly potent synthetic adrenaline, able to force both organic and synthetic \
+	bodies to bypass natural exertion limiters.</i>"
+	. += "<i>Though the drug came with known adverse side effects, the implant was explicitly designed to alleviate as many of said side effects as possible \
+	in hopes of getting an edge over their rival's offering. Additionally, as opposed to Biotech's full-spine replacement, the 'neothalamic system', as Interdyne called it, \
+	was marketed as smaller and more easily concealed on account of being installed deeper within the skull, notably beneath the thalamus in organic bodies.</i>"
+	. += "<i>The implant is prized by various military groups for its equally extreme utility in combat as the Qani-Laaca system. Among buyers, the most prominant of which \
+	is the Trans-Solar Federation, who allegedly were granted special license for iterative development. However, Interdyne has recieved heavy criticism for the apparent \
+	presence of the implant in various pirate and criminal groups."
+
+/obj/item/organ/internal/cyberimp/brain/berserk_processor/insert(mob/living/carbon/M, special = 0)
+	. = ..()
+	ADD_TRAIT(M, TRAIT_TRECHODRONE_ADAPTED, "[UID()]")
+
+/obj/item/organ/internal/cyberimp/brain/berserk_processor/remove(mob/living/carbon/M, special = 0)
+	. = ..()
+	REMOVE_TRAIT(M, TRAIT_TRECHODRONE_ADAPTED, "[UID()]")
+
+/obj/item/organ/internal/cyberimp/brain/berserk_processor/render()
+	if(isvox(owner))
+		custom_mob_sprite = "vox_sandy"
+	else if(isdrask(owner))
+		custom_mob_sprite = "drask_sandy"
+	else
+		custom_mob_sprite = "sandy"
+	var/mutable_appearance/our_MA = mutable_appearance('icons/mob/human_races/robotic.dmi', icon_state, layer = -INTORGAN_LAYER)
+	return our_MA
+
+/obj/item/organ/internal/cyberimp/brain/berserk_processor/emp_act(severity)
+	. = ..()
+	if(!.)
+		return
+	if(!COOLDOWN_FINISHED(src, berserk_processor_cooldown)) //Not on cooldown? Drug them up. Heavily. We don't want people self emping to bypass cooldown.
+		return
+	if(!prob(100 / severity) || !owner)
+		return
+
+	for(var/datum/action/item_action/organ_action/toggle/sensory_enhancer/SE in owner.actions)
+		SE.Trigger(FALSE, TRUE, TRUE)
+
+/datum/action/item_action/organ_action/toggle/berserk_processor
+	name = "Activate Orwell-Allens System"
+	desc = "Activates your Orwell-Allens computer and grants you its powers. LMB: Short, safer activation. ALT/MIDDLE: Longer, more powerful, more dangerous activation."
+	button_overlay_icon = 'icons/obj/surgery.dmi'
+	button_overlay_icon_state = "sandy"
+	check_flags = AB_CHECK_CONSCIOUS
+	/// Keeps track of how much trechodrone we inject into people on activation
+	var/injection_amount = 10
+
+/datum/action/item_action/organ_action/toggle/berserk_processor/AltTrigger()
+	Trigger(FALSE, TRUE)
+
+/datum/action/item_action/organ_action/toggle/berserk_processor/Trigger(left_click, attack_self, emp_triggered = FALSE)
+	. = ..()
+	if(istype(target, /obj/item/organ/internal/cyberimp/brain/berserk_processor))
+		var/obj/item/organ/internal/cyberimp/brain/berserk_processor/ourtarget = target
+		if(!COOLDOWN_FINISHED(ourtarget, berserk_processor_cooldown))
+			to_chat(owner, "<span class='warning'>[ourtarget] is still on cooldown for another [round(COOLDOWN_TIMELEFT(ourtarget, berserk_processor_cooldown), 1 SECONDS) / 10] seconds!</span>")
+			return
+
+		COOLDOWN_START(ourtarget, berserk_processor_cooldown, 5 MINUTES)
+
+		injection_amount = 10
+
+		if(!left_click)
+			injection_amount = 20
+		if(emp_triggered)
+			injection_amount = 40 //Time for a quick medical visit
+		Activate()
+
+/datum/action/item_action/organ_action/toggle/berserk_processor/proc/Activate(atom/target)
+
+	var/mob/living/carbon/human/human_owner = owner
+
+	human_owner.reagents.add_reagent("trechodrone", injection_amount)
+
+	owner.visible_message("<span class='danger'>[owner.name] twitches suddenly as two small glass vials are fired from ports in the implant near [owner.p_their()] neck, shattering as they land.</span>", \
+			"<span class='userdanger'>You twitch suddenly as your Orwell-Allens system ejects two empty glass vials rearward, shattering as they land.</span>")
+	playsound(human_owner, 'sound/goonstation/items/hypo.ogg', 80, TRUE)
+
+	var/obj/item/telegraph_vial = new /obj/item/orwell_allens_telegraph(get_turf(owner))
+	var/turf/turf_we_throw_at = get_edge_target_turf(owner, REVERSE_DIR(owner.dir))
+	telegraph_vial.throw_at(turf_we_throw_at, 5, 1)
+
+	// Safety net in case the injection amount doesn't get reset. Apparently it happened to someone in a round.
+	injection_amount = initial(injection_amount)
+
+/obj/item/orwell_allens_telegraph
+	name = "spent Orwell-Allens cartridge"
+	desc = "A small glass vial, usually kept in a large stack inside an Orwell-Allens implant, that is broken open and ejected \
+		each time the implant is used. If you're looking at one long enough to think about it this long, you either have fast eyes \
+		or were lucky enough to catch one before it broke."
+	icon = 'icons/obj/surgery.dmi'
+	icon_state = "blastoff_ampoule_empty"
+	w_class = WEIGHT_CLASS_TINY
+
+/obj/item/orwell_allens_telegraph/Initialize(mapload)
+	. = ..()
+	AddElement(/datum/element/shatters_when_thrown, /obj/effect/decal/cleanable/glass, 1, "shatter")
+	transform = transform.Scale(0.75, 0.75)
+
 /obj/item/organ/internal/cyberimp/brain/hackerman_deck
 	name = "\improper Binyat wireless hacking system"
 	desc = "A rare-to-find neural chip that allows its user to interface with nearby machinery from a distance \

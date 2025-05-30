@@ -1124,6 +1124,125 @@
 #undef MEPHEDRONE_BLUR_EFFECT
 #undef MEPHEDRONE_OVERDOSE_BLUR_EFFECT
 
+// Trechodrone drug, makes the takers of it stronger and able to resist stuns better, to potentially bad side effects
+/datum/reagent/trechodrone
+	name = "Trechodrone"
+	id = "trechodrone"
+	description = "A synthetic adrenaline developed by and for military contractors. \
+		Known side-effects include muscle tears, bone breakage, jitters, and stomach cramps. \
+		Can be intentionally overdosed to increase the drug's effects."
+	reagent_state = LIQUID
+	color = "#c22a44"
+	taste_description = "pure adrenaline"
+	metabolization_rate = 0.5 * REAGENTS_METABOLISM // 0.20, it does not last as long
+	overdose_threshold = 15
+	addiction_chance = 3
+	addiction_threshold = 20
+	shock_reduction = 60 // Much like Mephedrone, reduction to shock to help with damage / disablers, just higher since you're high on an adrenaline rush
+	allowed_overdose_process = TRUE
+	process_flags = ORGANIC | SYNTHETIC
+	/// Keeps track of how many chemicals we are delaying the changeling by.
+	var/changeling_chemical_tracker = 0
+	// Modifier to stuns and bonus damage
+	var/tenacity = 0.5
+	// Increases every cycle until it reaches 5, then causes a limb to break/fail
+	var/limbfailure_counter = 0
+	var/limbfailure_counter_max = 5
+	goal_department = "Science"
+	goal_difficulty = REAGENT_GOAL_HARD
+
+/datum/reagent/trechodrone/on_mob_add(mob/living/carbon/L)
+	if(ishuman(L))
+		var/mob/living/carbon/human/H = L
+		H.physiology.stun_mod *= tenacity
+		H.physiology.melee_bonus += tenacity * 10 // 5 extra melee damage, because this makes you a proper threat
+
+	L.sound_environment_override = SOUND_ENVIRONMENT_DIZZY
+
+	if(!IS_CHANGELING(L) || HAS_TRAIT(L, TRAIT_TRECHODRONE_ADAPTED))
+		return
+	var/datum/antagonist/changeling/cling = L.mind.has_antag_datum(/datum/antagonist/changeling)
+	cling.chem_recharge_slowdown += 1
+	changeling_chemical_tracker += 1
+
+/datum/reagent/trechodrone/on_mob_delete(mob/living/carbon/L)
+	if(ishuman(L))
+		var/mob/living/carbon/human/H = L
+		H.physiology.stun_mod /= tenacity
+		H.physiology.melee_bonus -= tenacity * 10 // Now you are no longer a proper threat
+
+	L.sound_environment_override = NONE
+
+	if(IS_CHANGELING(L))
+		var/datum/antagonist/changeling/cling = L.mind.has_antag_datum(/datum/antagonist/changeling)
+		cling.chem_recharge_slowdown -= changeling_chemical_tracker
+		changeling_chemical_tracker = 0
+
+	if(current_cycle < CONSTANT_DOSE_SAFE_LIMIT)
+		L.visible_message(
+			"<span class='danger'>[L] suddenly loosens up and stumbles, their body shuddering!</span>",
+			"<span class='danger'>You suddenly loosen up and stumble, your body shuddering from adrenaline!</span>")
+		L.AdjustJitter(5 SECONDS)
+		L.adjustStaminaLoss(current_cycle * 1.5)
+	else
+		L.visible_message(
+			"<span class='danger'>[L] suddenly loosens up and collapses from overexertion!</span>",
+			"<span class='danger'>As your adrenaline high subsides, you loosen up and collapse out of exhaustion!</span>")
+		var/cycle_scaling_effects = (current_cycle * 2)
+		L.AdjustJitter(10 SECONDS)
+		L.apply_damage(max(cycle_scaling_effects / 3, 60), STAMINA)
+		L.KnockDown((cycle_scaling_effects / 15) SECONDS) // a minute is a 4 second knockdown, 2 is 8, etc
+		if(!HAS_TRAIT(L, TRAIT_TRECHODRONE_ADAPTED) || current_cycle >= CONSTANT_DOSE_DEATH_LIMIT) // Much like Mephedrone, implant won't save you if you go that hard
+			if(ishuman(L))
+				to_chat(L, "<span class='danger'>You feel your body reel from the overexertion!</span>")
+				L.adjustBruteLoss(max(cycle_scaling_effects / 3, 150)) // 150 maximum damage. Not quite hardcrit, but you aren't reaching that number without a lot of medchems n' shit, so you deserve it
+				L.AdjustConfused(max(cycle_scaling_effects / 8) SECONDS) // Scaling confusion, because you are exhausted
+
+/datum/reagent/trechodrone/on_mob_life(mob/living/carbon/L)
+	var/update_flags = STATUS_UPDATE_NONE
+	if(ishuman(L))
+		update_flags |= L.adjustBruteLoss(0.5) // Overexerting your body slowly damages you, be it muscles or metal
+		if(prob(5))
+			L.emote(pick("twitch", "shake", "twitch_s"))
+
+	return ..() | update_flags
+
+/datum/reagent/trechodrone/overdose_start(mob/living/L)
+	ADD_TRAIT(L, TRAIT_FORCE_DOORS, id)
+
+	if(IS_CHANGELING(L))
+		var/datum/antagonist/changeling/cling = L.mind.has_antag_datum(/datum/antagonist/changeling)
+		cling.chem_recharge_slowdown += 1
+		changeling_chemical_tracker += 1
+
+/datum/reagent/trechodrone/overdose_end(mob/living/L)
+	REMOVE_TRAIT(L, TRAIT_FORCE_DOORS, id)
+
+	if(IS_CHANGELING(L))
+		var/datum/antagonist/changeling/cling = L.mind.has_antag_datum(/datum/antagonist/changeling)
+		if(changeling_chemical_tracker > 0) //Just in case this gets called somehow after on_remove is done
+			cling.chem_recharge_slowdown -= 1
+			changeling_chemical_tracker -= 1
+
+/datum/reagent/trechodrone/overdose_process(mob/living/carbon/L)
+	if(!(HAS_TRAIT(L, TRAIT_TRECHODRONE_ADAPTED)))
+		limbfailure_counter += 1
+
+	var/update_flags = STATUS_UPDATE_NONE
+	if(ishuman(L))
+		update_flags |= L.adjustStaminaLoss(-5) // Recover stamina faster
+		update_flags |= L.adjustBruteLoss(1.5) // Combined with damage from normal processing, you get 2 brute damage per cycle. Better have meds with you!
+
+		if(limbfailure_counter == limbfailure_counter_max) // Every 5 cycles, your limbs get worse
+			var/obj/item/organ/external/victim_limb = L.get_organ(pick(BODY_ZONE_R_ARM, BODY_ZONE_L_ARM, BODY_ZONE_R_LEG, BODY_ZONE_L_LEG, BODY_ZONE_PRECISE_L_HAND, BODY_ZONE_PRECISE_R_HAND, BODY_ZONE_PRECISE_L_FOOT, BODY_ZONE_PRECISE_R_FOOT))
+			if(victim_limb.is_robotic() || (victim_limb.status & (ORGAN_SPLINTED | ORGAN_BROKEN)))
+				victim_limb.receive_damage(10) // Robotic limbs, splinted limbs, or already broken limbs are not safe
+			else
+				to_chat(L, "<span class='danger'>You feel something break from overexerting yourself!</span>")
+				victim_limb.fracture(TRUE)
+			limbfailure_counter = 0
+
+	return ..() | update_flags
 
 //////////////////////////////
 //		Synth-Drugs			//

@@ -234,6 +234,7 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 #define TRAIT_NOSLIP "noslip"
 #define TRAIT_SCOPED "user_scoped"
 #define TRAIT_MEPHEDRONE_ADAPTED "mephedrone_adapted" // Trait that changes the ending effects of twitch leaving your system
+#define TRAIT_TRECHODRONE_ADAPTED "trechodrone_adapted" // Trait that prevents OD effects of Trechodrone
 #define TRAIT_NOKNOCKDOWNSLOWDOWN "noknockdownslowdown" //If this person has this trait, they are not slowed via knockdown, but they can be hit by bullets like a self knockdown
 #define TRAIT_CAN_STRIP "can_strip" // This mob can strip other mobs.
 #define TRAIT_CLING_BURSTING "cling_bursting" // This changeling is about to burst into a headslug, block cremation / gibber to prevent nullspace issues
@@ -249,6 +250,8 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 #define TRAIT_MINDFLAYER_NULLIFIED "flayer_nullified" //The mindflayer will not be able to activate their abilities, or drain swarms from people
 #define TRAIT_FLYING "flying"
 #define TRAIT_MED_MACHINE_HALLUCINATING "med_machine_hallucinating"  // medical machines (currently just scanners) will look strange.
+#define TRAIT_WEAK_TABLE_LEAP "weak_table_leap" // Lets mob mount tables notably faster but not faster than bartender or chef
+#define TRAIT_MID_TABLE_LEAP "mid_table_leap" // Improved version of weak_table_leap, but still not faster than bartender or chef
 /// This mob is antimagic, and immune to spells / cannot cast spells
 #define TRAIT_ANTIMAGIC "anti_magic"
 /// This allows a person who has antimagic to cast spells without getting blocked

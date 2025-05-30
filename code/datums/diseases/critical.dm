@@ -31,7 +31,7 @@
 	name = "Shock"
 	spread_text = "The patient is in shock."
 	cure_text = "Saline-Glucose Solution"
-	cures = list("salglu_solution", "syndicate_nanites", "stimulative_agent")
+	cures = list("salglu_solution", "syndicate_nanites", "stimulative_agent", "trechodrone")
 	cure_chance = 10
 	stage_prob = 6
 
@@ -84,7 +84,7 @@
 	name = "Cardiac Failure"
 	spread_text = "The patient is having a cardiac emergency."
 	cure_text = "Atropine, Epinephrine, or Heparin"
-	cures = list("atropine", "epinephrine", "heparin", "syndicate_nanites", "stimulative_agent")
+	cures = list("atropine", "epinephrine", "heparin", "syndicate_nanites", "stimulative_agent", "trechodrone")
 	cure_chance = 10
 	stage_prob = 5
 	severity = HARMFUL

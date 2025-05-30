@@ -404,6 +404,21 @@
 	build_path = /obj/item/organ/internal/cyberimp/brain/sensory_enhancer/rnd
 	category = list("Medical")
 
+/datum/design/cyberimp_berserk_processor
+	name = "Orwell-Allens Neothalamic System"
+	desc = "An experimental implant installed within the neck, just below the skull and close to thalamus of organics. When activated, it can give a temporary boost \
+	to physical capabilities, caused by removing natural limiters on strength exertion related to muscles and hydraulics. Due to its installed location and how it functions, \
+	it is incompatible with systems that heavily affect the nervous system, like the central nervous system rebooter. \
+	As a bonus effect, you are immune to limb breakage caused by trechodrone overexerting the body, as the computer reproccesses electrical and biological signals \
+	to regulate them in order to alleviate damage caused"
+	id = "ci-berserk-processor"
+	req_tech = list("combat" = 7, "biotech" = 7, "syndicate" = 5)
+	build_type = PROTOLATHE | MECHFAB
+	materials = list(MAT_METAL = 10000, MAT_SILVER = 2000, MAT_PLASMA = 10000, MAT_DIAMOND = 4000, MAT_BLUESPACE = 4000)
+	construction_time = 10 SECONDS
+	build_path = /obj/item/organ/internal/cyberimp/brain/berserk_processor/rnd
+	category = list("Medical")
+
 /datum/design/cyberimp_toolset_abductor
 	name = "Abductor Toolset Implant"
 	desc = "An alien toolset, designed to be installed on the subject's arm."

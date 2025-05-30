@@ -133,6 +133,15 @@
 	if(storedorgan)
 		return storedorgan.examine_more()
 
+/obj/item/autosurgeon/organ/syndicate/oneuse/berserk_processor
+	desc = "A single use autosurgeon that contains an Orwell-Allens neothalamic system. A screwdriver can be used to remove it, but implants can't be placed back in."
+	starting_organ = /obj/item/organ/internal/cyberimp/brain/berserk_processor
+
+/obj/item/autosurgeon/organ/syndicate/oneuse/berserk_processor/examine_more(mob/user)
+	. = ..()
+	if(storedorgan)
+		return storedorgan.examine_more()
+
 /obj/item/autosurgeon/organ/syndicate/oneuse/scope_eyes
 	desc = "A single use autosurgeon that contains Hardened Kaleido Optics eyes. A screwdriver can be used to remove it, but implants can't be placed back in."
 	starting_organ = /obj/item/organ/internal/eyes/cybernetic/scope/hardened
