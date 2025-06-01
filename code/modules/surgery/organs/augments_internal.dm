@@ -21,7 +21,7 @@
 	. = ..()
 	. += "<span class='notice'>It looks like it belongs in the [parse_zone(parent_organ)].</span>"
 
-//[[[[BRAIN]]]]
+// MARK:	Brain Implants
 
 /obj/item/organ/internal/cyberimp/brain
 	name = "cybernetic brain implant"
@@ -695,7 +695,8 @@
 /datum/spell/hackerman_deck/proc/lower_recent_hacking()
 	recent_hacking--
 
-//[[[[MOUTH]]]]
+// MARK:	Mouth Implants
+
 /obj/item/organ/internal/cyberimp/mouth
 	parent_organ = "mouth"
 
@@ -714,7 +715,157 @@
 		to_chat(owner, "<span class='warning'>Your breathing tube suddenly closes!</span>")
 		owner.AdjustLoseBreath(4 SECONDS)
 
-//[[[[CHEST]]]]
+/obj/item/organ/internal/cyberimp/mouth/taste_interpreter
+	name = "taste interpreter"
+	desc = "A complicated set of olfactory sensors connected to an interpretation module which sends processed signals to the brain as approximations of taste. Sensitivity can be set between four settings. A very handy implant for species without taste!"
+	icon_state = "implant_mask"
+	slot = "taste_interpreter"
+	origin_tech = "materials=4;biotech=3"
+	actions_types = list(/datum/action/item_action/organ_action/toggle)
+
+	var/on_implant_sensitivity = null // Contingency variable. Even though initial() exists, I just want to be extra sure their taste is set correctly on removal/deactivation
+
+/obj/item/organ/internal/cyberimp/mouth/taste_interpreter/insert(mob/living/carbon/M, special, dont_remove_slot)
+	. = ..()
+	var/mob/living/carbon/human/user = M
+	if(user.dna.species)
+		on_implant_sensitivity = user.dna.species.taste_sensitivity
+
+/obj/item/organ/internal/cyberimp/mouth/taste_interpreter/remove(mob/living/carbon/M, special)
+	. = ..()
+	var/mob/living/carbon/human/user = M
+	if(user.dna.species)
+		user.dna.species.taste_sensitivity = on_implant_sensitivity
+
+/obj/item/organ/internal/cyberimp/mouth/taste_interpreter/emp_act()
+	if(owner && !crit_fail)
+		var/mob/living/carbon/human/user = owner
+		if(user.dna.species)
+			user.dna.species.taste_sensitivity = on_implant_sensitivity
+		to_chat(owner, "<span class='danger'>An inexplicable and foul taste courses through your mouth before immediately vanishing.</span>")
+		addtimer(CALLBACK(src, PROC_REF(reboot)), 30 SECONDS)
+		crit_fail = TRUE
+
+/obj/item/organ/internal/cyberimp/mouth/taste_interpreter/proc/reboot()
+	crit_fail = FALSE
+	if(owner)
+		to_chat(owner, "<span class='warning'>An inexplicable yet pleasant taste pulses through your mouth.</span>")
+
+/obj/item/organ/internal/cyberimp/mouth/taste_interpreter/ui_action_click()
+	if(crit_fail && owner)
+		to_chat(owner, "<span class='warning'>Your taste interpreter seems to be unresponsive...</span>")
+		return
+
+	radial_menu(owner)
+
+/obj/item/organ/internal/cyberimp/mouth/taste_interpreter/proc/check_menu(mob/user)
+	return (owner && owner == user && owner.stat != DEAD && (src in owner.internal_organs))
+
+/obj/item/organ/internal/cyberimp/mouth/taste_interpreter/proc/radial_menu(mob/user)
+	var/list/choices = list(
+		"Off",
+		"No sensitivity",
+		"Dull sensitivity",
+		"Normal sensitivity",
+		"Sharp sensitivity",
+	)
+	choices["["Off"]"] = image(icon = 'icons/obj/aicards.dmi', icon_state = "pai-off")
+	choices["["No sensitivity"]"] = image(icon = 'icons/obj/aicards.dmi', icon_state = "pai-sad")
+	choices["["Dull sensitivity"]"] = image(icon = 'icons/obj/aicards.dmi', icon_state = "pai-what")
+	choices["["Normal sensitivity"]"] = image(icon = 'icons/obj/aicards.dmi', icon_state = "pai-happy")
+	choices["["Sharp sensitivity"]"] = image(icon = 'icons/obj/aicards.dmi', icon_state = "pai-extremely-happy")
+	var/choice = show_radial_menu(user, user, choices, custom_check = CALLBACK(src, PROC_REF(check_menu), user))
+	if(!check_menu(user))
+		return
+
+	var/mob/living/carbon/human/taster = user
+	if(taster.dna.species)
+		var/final_sensitivity = on_implant_sensitivity
+		switch(choice)
+			if("Off")
+				final_sensitivity = on_implant_sensitivity
+			if("No sensitivity")
+				final_sensitivity = TASTE_SENSITIVITY_NO_TASTE
+			if("Dull sensitivity")
+				final_sensitivity = TASTE_SENSITIVITY_DULL
+			if("Normal sensitivity")
+				final_sensitivity = TASTE_SENSITIVITY_NORMAL
+			if("Sharp sensitivity")
+				final_sensitivity = TASTE_SENSITIVITY_SHARP
+
+		taster.dna.species.taste_sensitivity = final_sensitivity
+		to_chat(taster, "<span class='notice'>You set your taste interpeter to [choice].</span>")
+
+// MARK:	Ear Implants
+
+/obj/item/organ/internal/cyberimp/ear
+	name = "cybernetic ear implant"
+	desc = "Additional sensors and processors for the ears. You should not be seeing this, notify an admin!"
+	icon_state = "chest_implant"
+	implant_overlay = "chest_implant_overlay"
+	parent_organ = "head"
+	/// Does the implant have effects that can be disabled/enabled?
+	var/needs_activation = TRUE
+	/// Assuming need_activation = TRUE, is the implant active?
+	var/active = TRUE
+
+/obj/item/organ/internal/cyberimp/ear/emp_act(severity)
+	if(!owner || emp_proof)
+		return
+	if(prob(50 / severity) && owner)
+		owner.Dizzy(10 SECONDS) // Ears affect balance, so lets have this do that instead of the predictable "deafness, bozo"
+		to_chat(owner, "<span class='warning'>You feel your balance go off-kilter!</span>")
+	if(needs_activation && active != FALSE)
+		active = FALSE
+
+/*
+
+Note to self: Language code is Hell, do this implant later
+
+/obj/item/organ/internal/cyberimp/ear/manual_translator
+	name = "manual translator implant"
+	desc = "Allows users to select a language from a pre-loaded list to be translated."
+	slot = "ear_translator"
+	origin_tech = "materials=4;biotech=6"
+	actions_types = list(/datum/action/item_action/organ_action/toggle)
+
+	var/selected_language = null
+	var/languages_avaliable = list(
+		// Primary languages
+		/datum/language/unathi,
+		/datum/language/tajaran,
+		/datum/language/vulpkanin,
+		/datum/language/skrell,
+		/datum/language/vox,
+		/datum/language/diona,
+		/datum/language/trinary,
+		/datum/language/kidan,
+		/datum/language/slime,
+		/datum/language/drask,
+		/datum/language/moth,
+		/datum/language/human,
+		/datum/lanugage/common, // Not strictly necessary, but why not?
+		// Secondary languages
+		/datum/language/trader,
+		/datum/language/gutter,
+		/datum/language/clown,
+		/datum/language/com_zvezhan,
+	)
+
+/obj/item/organ/internal/cyberimp/ear/manual_translator/proc/implant_grant_language(mob/living/carbon/user, lang_give)
+	user.add_language(lang_give)
+
+/obj/item/organ/internal/cyberimp/ear/manual_translator/proc/implant_remove_language(mob/living/carbon/user, lang_take)
+	user.remove_language(lang_take)
+
+/obj/item/organ/internal/cyberimp/ear/manual_translator/examine(mob/user)
+	. = ..()
+	if(emp_proof)
+		. += " The implant has been hardened. It is invulnerable to EMPs."
+*/
+
+// MARK:	Chest Implants
+
 /obj/item/organ/internal/cyberimp/chest
 	name = "cybernetic torso implant"
 	desc = "implants for the organs in your torso."
@@ -1022,6 +1173,8 @@
 	spark_system.start()
 	return COMPONENT_BLOCK_JAUNT
 
+// MARK:	IPC-exclusive
+
 /obj/item/organ/internal/cyberimp/chest/ipc_repair
 	name = "Reactive Repair Implant"
 	desc = "This implant reworks the IPC frame, in order to incorporate materials that return to their original shape after being damaged. Requires power to function."
@@ -1118,7 +1271,18 @@
 	REMOVE_TRAIT(M, TRAIT_MINDFLAYER_NULLIFIED, UNIQUE_TRAIT_SOURCE(src))
 	return ..()
 
-//BOX O' IMPLANTS
+/obj/item/organ/internal/cyberimp/chest/casing
+	name = "NU-11 chassis casing implant"
+	desc = "A set of mysterious plating that looks like it belongs to an IPC chassis. You should not be seeing this, notify an admin!"
+	implant_color = "#eeff00"
+	origin_tech = "materials=5;programming=4;biotech=4"
+	slot = "casing"
+	emp_proof = TRUE // These are casings, nothing that an EMP would affect
+	requires_machine_person = TRUE
+
+/obj/item/organ/internal/cyberimp/chest/casing/pressure_casing
+
+// MARK:	Box O' Implants
 
 /obj/item/storage/box/cyber_implants
 	name = "boxed cybernetic implants"

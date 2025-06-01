@@ -58,6 +58,7 @@
 	var/lying_prev = 0
 	var/lastpuke = 0
 	var/list/languages = list()         // For speaking/listening.
+	var/list/translated = list()		// Seperate list for handling languages understood but not spoken. Usually temporary.
 	var/list/speak_emote = list("says") // Verbs used when speaking. Defaults to 'say' if speak_emote is null.
 	var/emote_type = EMOTE_VISIBLE		// Define emote default type, 1 for seen emotes, 2 for heard emotes
 	var/name_archive //For admin things like possession

@@ -252,6 +252,9 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 #define TRAIT_MED_MACHINE_HALLUCINATING "med_machine_hallucinating"  // medical machines (currently just scanners) will look strange.
 #define TRAIT_WEAK_TABLE_LEAP "weak_table_leap" // Lets mob mount tables notably faster but not faster than bartender or chef
 #define TRAIT_MID_TABLE_LEAP "mid_table_leap" // Improved version of weak_table_leap, but still not faster than bartender or chef
+#define TRAIT_TOTAL_HEARING_PROTECTION "total_hearing_protection" // Provides total hearing protection
+#define TRAIT_MAJOR_HEARING_PROTECTION "major_hearing_protection" // Provides major hearing protection
+#define TRAIT_MINOR_HEARING_PROTECTION "minor_hearing_protection" // Provides minor hearing protection
 /// This mob is antimagic, and immune to spells / cannot cast spells
 #define TRAIT_ANTIMAGIC "anti_magic"
 /// This allows a person who has antimagic to cast spells without getting blocked

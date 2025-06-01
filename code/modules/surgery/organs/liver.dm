@@ -56,3 +56,18 @@
 	desc = "An electronic device designed to mimic the functions of a human liver. It has no benefits over an organic liver, but is easy to produce."
 	origin_tech = "biotech=4"
 	status = ORGAN_ROBOT
+
+/obj/item/organ/internal/liver/cybernetic/upgraded
+	name = "upgraded cybernetic liver"
+	desc = "A more advanced version of a cybernetic liver. Capable of slowly purging radiation as well as excess nutrition from the body."
+	origin_tech = "biotech=5"
+
+/obj/item/organ/internal/liver/cybernetic/upgraded/on_life()
+	..()
+
+	var/mob/living/carbon/human/user = owner
+	if(user.radiation > 0)
+		user.radiation = max(0, owner.radiation - 10) // Less effective than medicines, but suitable enough
+
+	if(user.overeatduration > 90) // Helps you past the slimming finishline, but not much further
+		user.overeatduration -= 2

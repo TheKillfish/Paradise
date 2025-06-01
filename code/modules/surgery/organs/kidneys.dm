@@ -23,3 +23,14 @@
 	desc = "An electronic device designed to mimic the functions of human kidneys. It has no benefits over a pair of organic kidneys, but is easy to produce."
 	origin_tech = "biotech=4"
 	status = ORGAN_ROBOT
+
+/obj/item/organ/internal/kidneys/cybernetic/upgraded
+	name = "upgraded cybernetic kidneys"
+	desc = "A more advanced pair of cybernetic kidneys. They have improved filtration capabilities, allowing toxins in the body to be filtered out."
+	origin_tech = "biotech=5"
+
+/obj/item/organ/internal/kidneys/cybernetic/upgraded/on_life()
+	..()
+
+	if(owner.getToxLoss())
+		owner.adjustToxLoss(-0.2 * PROCESS_ACCURACY)

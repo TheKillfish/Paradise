@@ -821,10 +821,16 @@
 /mob/living/carbon/human/check_ear_prot()
 	if(!can_hear())
 		return HEARING_PROTECTION_TOTAL
+	if(HAS_TRAIT(src, TRAIT_TOTAL_HEARING_PROTECTION))
+		return HEARING_PROTECTION_TOTAL
 	if(istype(l_ear, /obj/item/clothing/ears/earmuffs))
 		return HEARING_PROTECTION_TOTAL
 	if(istype(r_ear, /obj/item/clothing/ears/earmuffs))
 		return HEARING_PROTECTION_TOTAL
+	if(HAS_TRAIT(src, TRAIT_MAJOR_HEARING_PROTECTION))
+		return HEARING_PROTECTION_MAJOR
+	if(HAS_TRAIT(src, TRAIT_MINOR_HEARING_PROTECTION))
+		return HEARING_PROTECTION_MINOR
 	if(head && (head.flags & HEADBANGPROTECT))
 		return HEARING_PROTECTION_MINOR
 	if(l_ear && (l_ear.flags & EARBANGPROTECT))
