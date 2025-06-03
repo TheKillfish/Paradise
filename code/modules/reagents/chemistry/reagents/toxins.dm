@@ -405,7 +405,7 @@
 	goal_difficulty = REAGENT_GOAL_EASY
 
 /datum/reagent/acetic_acid/reaction_mob(mob/living/carbon/human/H, method = REAGENT_TOUCH, volume)
-	if(HAS_TRAIT(M, TRAIT_ACID_PROOF))
+	if(HAS_TRAIT(H, TRAIT_ACID_PROOF))
 		return
 
 	if(method != REAGENT_TOUCH)
