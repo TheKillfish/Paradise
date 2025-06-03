@@ -451,7 +451,7 @@
 	it is incompatible with systems that heavily affect the nervous system, like the central nervous system rebooter. \
 	As a bonus effect, you are immune to limb breakage caused by trechodrone overexerting the body, as the computer reproccesses electrical and biological signals \
 	to regulate them in order to alleviate damage caused."
-	icon_state = "sandy"
+	icon_state = "berserk"
 	implant_overlay = null
 	implant_color = null
 	slot = "brain_antistun"
@@ -459,7 +459,7 @@
 	actions_types = list(/datum/action/item_action/organ_action/toggle/berserk_processor)
 	origin_tech = "combat=6;biotech=6;syndicate=4"
 	///The icon state used for the on mob sprite. Default is sandy. Drask and vox have their own unique sprites
-	var/custom_mob_sprite = "sandy"
+	var/custom_mob_sprite = "berserk"
 	COOLDOWN_DECLARE(berserk_processor_cooldown)
 
 /obj/item/organ/internal/cyberimp/brain/berserk_processor/rnd
@@ -487,11 +487,11 @@
 
 /obj/item/organ/internal/cyberimp/brain/berserk_processor/render()
 	if(isvox(owner))
-		custom_mob_sprite = "vox_sandy"
+		custom_mob_sprite = "vox_berserk"
 	else if(isdrask(owner))
-		custom_mob_sprite = "drask_sandy"
+		custom_mob_sprite = "drask_berserk"
 	else
-		custom_mob_sprite = "sandy"
+		custom_mob_sprite = "berserk"
 	var/mutable_appearance/our_MA = mutable_appearance('icons/mob/human_races/robotic.dmi', icon_state, layer = -INTORGAN_LAYER)
 	return our_MA
 
@@ -1277,10 +1277,46 @@ Note to self: Language code is Hell, do this implant later
 	implant_color = "#eeff00"
 	origin_tech = "materials=5;programming=4;biotech=4"
 	slot = "casing"
-	emp_proof = TRUE // These are casings, nothing that an EMP would affect
+	emp_proof = TRUE // These are casings, they have nothing that an EMP would affect
 	requires_machine_person = TRUE
 
 /obj/item/organ/internal/cyberimp/chest/casing/pressure_casing
+	name = "pressure-proof chassis casing"
+	desc = "A set of specialized plating and sealants that renders the installed chassis proofed against high and low pressures, and provides good thermal insulation. \
+	This plating is not armor however, and in fact worsens the effects of physical trauma."
+
+/obj/item/organ/internal/cyberimp/chest/casing/pressure_casing/insert(mob/living/carbon/M, special = FALSE)
+	..()
+	ADD_TRAIT(M, TRAIT_PRESSURE_PROOF, "[UID()]")
+	// 30% better resistance to heat and cold, but equally worsened brute damage
+	owner.physiology.heat_mod /= 1.30
+	owner.physiology.cold_mod /= 1.30
+	owner.physiology.brute_mod *= 1.30
+
+/obj/item/organ/internal/cyberimp/chest/casing/pressure_casing/remove(mob/living/carbon/M, special = FALSE)
+	REMOVE_TRAIT(M, TRAIT_PRESSURE_PROOF, "[UID()]")
+	owner.physiology.heat_mod *= 1.30
+	owner.physiology.cold_mod *= 1.30
+	owner.physiology.brute_mod /= 1.30
+	return ..()
+
+/obj/item/organ/internal/cyberimp/chest/casing/hazmat
+	name = "hazmat chassis casing"
+	desc = "A set of specialized non-corrosive, antimicrobial plating and an inner liner of radiation-proof material, the installation of which provides \
+	substantial protection against class 6 to class 8 hazardous materials. The materials involved, however, get hot very quickly, amplify laser damage, and \
+	naturally the casing itself doesn't prevent radioactive contamination."
+	var/datum/armor/hazmat_casing_armor = new /datum/armor(laser_value = -20, rad_value = INFINITY, acid_value = INFINITY)
+
+/obj/item/organ/internal/cyberimp/chest/casing/hazmat/insert(mob/living/carbon/M, special = FALSE)
+	..()
+	// Laser and heat worsening is because the plating is made of glass
+	owner.physiology.armor = owner.physiology.armor.attachArmor(hazmat_casing_armor)
+	owner.physiology.heat_mod /= 1.20
+
+/obj/item/organ/internal/cyberimp/chest/casing/hazmat/remove(mob/living/carbon/M, special = FALSE)
+	owner.physiology.armor = owner.physiology.armor.detachArmor(hazmat_casing_armor)
+	owner.physiology.heat_mod *= 1.20
+	return ..()
 
 // MARK:	Box O' Implants
 

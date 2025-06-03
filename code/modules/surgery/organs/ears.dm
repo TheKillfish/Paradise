@@ -48,7 +48,7 @@
 
 /obj/item/organ/internal/ears/cybernetic/upgraded/insert(mob/living/carbon/M, special, dont_remove_slot)
 	..()
-	ADD_TRAIT(M, TRAIT_MINOR_HEARING_PROTECTION, "[UID()]") // Originalyl was going to be major, but let the H.O.N.Ks have their fun
+	ADD_TRAIT(M, TRAIT_MINOR_HEARING_PROTECTION, "[UID()]") // Originally was going to be major, but let the H.O.N.Ks have their fun
 
 /obj/item/organ/internal/ears/cybernetic/upgraded/remove(mob/living/carbon/M, special)
 	REMOVE_TRAIT(M, TRAIT_MINOR_HEARING_PROTECTION, "[UID()]")

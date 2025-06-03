@@ -24,6 +24,10 @@
 		return
 	var/acid_damage_modifier = 100
 	if(isliving(target))
+		var/mob/living/L = target
+		if(HAS_TRAIT(L, TRAIT_ACID_PROOF))
+			to_chat(C, "<span class='alertalien'>You get the impression [L] cannot be dissolved.</span>")
+			return
 		acid_damage_modifier = 50
 	if(target.acid_act(2 * acid_damage_modifier, acid_damage_modifier))
 		visible_message("<span class='alertalien'>[C] vomits globs of vile stuff all over [target]. It begins to sizzle and melt under the bubbling mess of acid!</span>")

@@ -363,6 +363,8 @@
 		if(!ishuman(L) || isgrey(L)) // greys and natural fauna shouldnt be affected by acid rain
 			return
 		var/mob/living/carbon/human/H = L
+		if(HAS_TRAIT(H, TRAIT_ACID_PROOF)) // If they're acidproof, they won't be affected
+			return
 		if(!H.wear_suit || !H.head) // No need to check further if they dont have clothing on
 			H.adjustFireLoss(2)
 			H.adjustBruteLoss(2)

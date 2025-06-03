@@ -255,6 +255,8 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 #define TRAIT_TOTAL_HEARING_PROTECTION "total_hearing_protection" // Provides total hearing protection
 #define TRAIT_MAJOR_HEARING_PROTECTION "major_hearing_protection" // Provides major hearing protection
 #define TRAIT_MINOR_HEARING_PROTECTION "minor_hearing_protection" // Provides minor hearing protection
+#define TRAIT_PRESSURE_PROOF "pressure_proof" // What it says on the tin; makes the mob pressure proof
+#define TRAIT_ACID_PROOF "acid_proof" // Prevents damage from acidic sources
 /// This mob is antimagic, and immune to spells / cannot cast spells
 #define TRAIT_ANTIMAGIC "anti_magic"
 /// This allows a person who has antimagic to cast spells without getting blocked

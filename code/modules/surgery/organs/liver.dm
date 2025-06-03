@@ -67,7 +67,7 @@
 
 	var/mob/living/carbon/human/user = owner
 	if(user.radiation > 0)
-		user.radiation = max(0, owner.radiation - 10) // Less effective than medicines, but suitable enough
+		user.radiation = max(0, owner.radiation - 10) // Less effective than actually getting medicine, but good enough
 
 	if(user.overeatduration > 90) // Helps you past the slimming finishline, but not much further
 		user.overeatduration -= 2

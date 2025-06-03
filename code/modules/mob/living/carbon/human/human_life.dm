@@ -82,7 +82,7 @@
 	var/pressure_difference = abs( pressure - ONE_ATMOSPHERE )
 
 	var/pressure_adjustment_coefficient = 1	//Determins how much the clothing you are wearing protects you in percent.
-	if(wear_suit && (wear_suit.flags & STOPSPRESSUREDMAGE) && head && (head.flags & STOPSPRESSUREDMAGE)) // Complete set of pressure-proof suit worn, assume fully sealed.
+	if((wear_suit && (wear_suit.flags & STOPSPRESSUREDMAGE) && head && (head.flags & STOPSPRESSUREDMAGE)) || HAS_TRAIT(src, TRAIT_PRESSURE_PROOF)) // Complete set of pressure-proof suit worn, assume fully sealed.
 		pressure_adjustment_coefficient = 0
 	pressure_adjustment_coefficient = max(pressure_adjustment_coefficient,0) //So it isn't less than 0
 	pressure_difference = pressure_difference * pressure_adjustment_coefficient

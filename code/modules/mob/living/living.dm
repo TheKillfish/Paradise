@@ -357,10 +357,13 @@
 	flash_eyes()
 
 /mob/living/acid_act(acidpwr, acid_volume)
+	if(HAS_TRAIT(src, TRAIT_ACID_PROOF))
+		to_chat(src, "<span class='notice'>The acid does nothing to you!</span>")
+		return FALSE
 	take_organ_damage(acidpwr * min(1, acid_volume * 0.1))
 	to_chat(src, "<span class='userdanger'>The acid burns you!</span>")
 	playsound(src, 'sound/weapons/sear.ogg', 50, TRUE)
-	return 1
+	return TRUE
 
 /mob/living/welder_act(mob/user, obj/item/I)
 	if(!I.tool_use_check(user, 0, TRUE))

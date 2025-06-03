@@ -293,6 +293,9 @@
 	if(!ishuman(M) || isgrey(M))
 		return
 
+	if(HAS_TRAIT(M, TRAIT_ACID_PROOF))
+		return
+
 	var/mob/living/carbon/human/H = M
 	if(method != REAGENT_TOUCH)
 		to_chat(H, "<span class='warning'>The greenish acidic substance stings[volume < 10 ? " you, but isn't concentrated enough to harm you" : null]!</span>")
@@ -354,7 +357,7 @@
 
 	var/mob/living/carbon/human/H = M
 	if(method == REAGENT_TOUCH && volume > 9)
-		if(!H.wear_mask && !H.head)
+		if((!H.wear_mask && !H.head) || !HAS_TRAIT(H, TRAIT_ACID_PROOF))
 			var/obj/item/organ/external/affecting = H.get_organ("head")
 			if(istype(affecting))
 				affecting.disfigure()
@@ -383,7 +386,10 @@
 		if(protected)
 			return
 
-	if(volume >= 5)
+	if(HAS_TRAIT(M, TRAIT_ACID_PROOF))
+		return
+
+	if(volume >= 5 || !HAS_TRAIT(H, TRAIT_ACID_PROOF))
 		H.emote("scream")
 		H.adjustFireLoss(clamp((volume - 5) * 3, 4, 75))
 	to_chat(H, "<span class='warning'>The blueish acidic substance stings[volume < 5 ? " you, but isn't concentrated enough to harm you" : null]!</span>")
@@ -399,6 +405,9 @@
 	goal_difficulty = REAGENT_GOAL_EASY
 
 /datum/reagent/acetic_acid/reaction_mob(mob/living/carbon/human/H, method = REAGENT_TOUCH, volume)
+	if(HAS_TRAIT(M, TRAIT_ACID_PROOF))
+		return
+
 	if(method != REAGENT_TOUCH)
 		to_chat(H, "<span class='warning'>The transparent acidic substance stings[volume < 25 ? " you, but isn't concentrated enough to harm you" : null]!</span>")
 		if(volume >= 25)
