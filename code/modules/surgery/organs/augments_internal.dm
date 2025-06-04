@@ -1309,11 +1309,13 @@ Note to self: Language code is Hell, do this implant later
 
 /obj/item/organ/internal/cyberimp/chest/casing/hazmat/insert(mob/living/carbon/M, special = FALSE)
 	..()
+	ADD_TRAIT(M, TRAIT_ACID_PROOF, "[UID()]")
 	// Laser and heat worsening is because the plating is made of glass
 	owner.physiology.armor = owner.physiology.armor.attachArmor(hazmat_casing_armor)
 	owner.physiology.heat_mod /= 1.20
 
 /obj/item/organ/internal/cyberimp/chest/casing/hazmat/remove(mob/living/carbon/M, special = FALSE)
+	REMOVE_TRAIT(M, TRAIT_ACID_PROOF, "[UID()]")
 	owner.physiology.armor = owner.physiology.armor.detachArmor(hazmat_casing_armor)
 	owner.physiology.heat_mod *= 1.20
 	return ..()
