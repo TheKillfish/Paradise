@@ -11,6 +11,7 @@
 	w_class = WEIGHT_CLASS_NORMAL
 	actions_types = list(/datum/action/item_action/organ_action/toggle)
 
+	var/message = TRUE
 	var/range = 1 // How far away your clicked target can be
 	var/enabled_handscanner = TRUE // Determines if your help intent on the installed hand will do a scan or not
 	var/printer_compatible = FALSE // If true, you can target photocopiers to print readouts of whatever it is you need a printout of
@@ -60,10 +61,10 @@
 
 /obj/item/organ/internal/cyberimp/handscanner/insert(mob/living/carbon/M, special, dont_remove_slot)
 	. = ..()
-	RegisterSignal(M, COMSIG_CLICK_ALT, PROC_REF(perform_scan_action))
+	RegisterSignal(M, COMSIG_CLICK_CTRL_SHIFT, PROC_REF(perform_scan_action))
 
 /obj/item/organ/internal/cyberimp/handscanner/remove(mob/living/carbon/M, special = 0)
-	UnregisterSignal(M, COMSIG_CLICK_ALT)
+	UnregisterSignal(M, COMSIG_CLICK_CTRL_SHIFT)
 	. = ..()
 
 /obj/item/organ/internal/cyberimp/handscanner/proc/perform_scan_action(mob/user, atom/target)
@@ -80,10 +81,13 @@
 			active_hand = "r_hand"
 
 	if(parent_organ == active_hand)
-		if(user.a_intent == INTENT_HELP && enabled_handscanner)
+		if(enabled_handscanner)
 			if(printer_compatible && istype(target, /obj/machinery/photocopier))
 				print_action(user, target)
 			else
+				if(message)
+					user.visible_message("<span class='notice'>[user] waves [user.p_their()] [parent_organ == "r_hand" ? "right" : "left"] hand over [target].</span>",
+					"<span class='notice'>You wave your [parent_organ == "r_hand" ? "right" : "left"] hand over [target], scanning them.</span>")
 				desired_scan_action(user, target)
 
 /obj/item/organ/internal/cyberimp/handscanner/proc/desired_scan_action(mob/user, atom/target)
@@ -118,12 +122,10 @@
 	desc = "A health analyzer in handscanner form. Provides a readout of most organic creatures with just a swipe of your hand!"
 
 /obj/item/organ/internal/cyberimp/handscanner/health_analyzer/desired_scan_action(mob/user, atom/target)
-	..()
+	. = ..()
 
 	if(ishuman(target))
 		var/mob/living/carbon/carb_targ = target
-		user.visible_message("<span class='notice'>[user] waves [user.p_their()] [parent_organ == "r_hand" ? "right" : "left"] hand over [carb_targ].</span>",
-		"<span class='notice'>You wave your [parent_organ == "r_hand" ? "right" : "left"] hand over [carb_targ], scanning them.</span>")
 		healthscan(user, carb_targ, 1, TRUE) // Advanced healthscan, since these handscanners will be on the pricier side of Research
 
 /obj/item/organ/internal/cyberimp/handscanner/machine_analyzer
@@ -135,8 +137,6 @@
 
 	if(ishuman(target))
 		var/mob/living/carbon/carb_targ = target
-		user.visible_message("<span class='notice'>[user] waves [user.p_their()] [parent_organ == "r_hand" ? "right" : "left"] hand over [carb_targ].</span>",
-		"<span class='notice'>You wave your [parent_organ == "r_hand" ? "right" : "left"] hand over [carb_targ], scanning them.</span>")
 		robot_healthscan(user, carb_targ)
 
 /obj/item/organ/internal/cyberimp/handscanner/reagent_scanner
@@ -239,9 +239,6 @@
 /obj/item/organ/internal/cyberimp/handscanner/mail_scanner/desired_scan_action(mob/user, atom/target)
 	. = ..()
 
-	user.visible_message("<span class='notice'>[user] waves [user.p_their()] [parent_organ == "r_hand" ? "right" : "left"] hand over [target].</span>",
-	"<span class='notice'>You wave your [parent_organ == "r_hand" ? "right" : "left"] hand over [target], scanning them.</span>")
-
 	if(istype(target, /obj/item/envelope))
 		var/obj/item/envelope/envelope = target
 		if(envelope.has_been_scanned)
@@ -287,6 +284,7 @@
 	name = "forensic handscanner"
 	desc = "A forensic scanner in handscanner form. While capable of processing and storing hefty amounts of information, it lacks search functions and requires interfacing with a photocopier to produce print-outs."
 	actions_types = list(/datum/action/item_action/organ_action/toggle, /datum/action/item_action/clear_records)
+	message = FALSE
 	var/scanning = FALSE
 	var/list/log = list()
 	var/obj/item/paper/printout_log // Tracks for printing logs

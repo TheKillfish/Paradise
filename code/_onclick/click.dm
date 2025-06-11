@@ -414,6 +414,7 @@
 	return
 
 /atom/proc/CtrlShiftClick(mob/user, modifiers)
+	SEND_SIGNAL(src, COMSIG_CLICK_CTRL_SHIFT, user)
 	return
 
 /mob/proc/AltShiftClickOn(atom/A, modifiers)

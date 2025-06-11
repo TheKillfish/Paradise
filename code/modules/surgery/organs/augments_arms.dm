@@ -426,11 +426,17 @@
 	var/obj/machinery/power/apc/A = target
 	var/mob/living/carbon/human/H = user
 	var/datum/organ/battery/power_source = H.get_int_organ_datum(ORGAN_DATUM_BATTERY)
+	var/obj/item/organ/internal/cell/battery = H.get_int_organ(/obj/item/organ/internal/cell)
 	if(istype(power_source))
 		if(A.emagged || A.stat & BROKEN)
-			do_sparks(3, 1, A)
-			to_chat(H, "<span class='warning'>The APC power currents surge erratically, damaging your chassis!</span>")
-			H.adjustFireLoss(10,0)
+			var/obj/item/organ/internal/cell/overvoltageproof/proofed_battery = battery
+			if(!istype(battery, /obj/item/organ/internal/cell/overvoltageproof) || proofed_battery.protection_inactive)
+				do_sparks(3, 1, A)
+				to_chat(H, "<span class='warning'>The APC power currents surge erratically, damaging your chassis!</span>")
+				H.adjustFireLoss(10,0)
+			else
+				do_sparks(3, 1, A)
+				to_chat(H, "<span class='warning'>The APC power currents surge erratically, but your overvoltage-proofed microbattery spares you from damage!</span>")
 		else if(A.cell && A.cell.charge > 0)
 			if(H.nutrition >= NUTRITION_LEVEL_WELL_FED)
 				to_chat(user, "<span class='warning'>You are already fully charged!</span>")
