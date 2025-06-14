@@ -352,6 +352,7 @@
 	This is overridden in ai.dm
 */
 /mob/proc/ShiftClickOn(atom/A, modifiers)
+	SEND_SIGNAL(src, COMSIG_CLICK_SHIFT, A, src)
 	A.ShiftClick(src, modifiers)
 	return
 /atom/proc/ShiftClick(mob/user, modifiers)

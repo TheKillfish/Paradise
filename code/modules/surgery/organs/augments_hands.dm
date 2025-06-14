@@ -61,10 +61,10 @@
 
 /obj/item/organ/internal/cyberimp/handscanner/insert(mob/living/carbon/M, special, dont_remove_slot)
 	. = ..()
-	RegisterSignal(M, COMSIG_CLICK_CTRL_SHIFT, PROC_REF(perform_scan_action))
+	RegisterSignal(M, COMSIG_CLICK_SHIFT, PROC_REF(perform_scan_action))
 
 /obj/item/organ/internal/cyberimp/handscanner/remove(mob/living/carbon/M, special = 0)
-	UnregisterSignal(M, COMSIG_CLICK_CTRL_SHIFT)
+	UnregisterSignal(M, COMSIG_CLICK_SHIFT)
 	. = ..()
 
 /obj/item/organ/internal/cyberimp/handscanner/proc/perform_scan_action(mob/user, atom/target)

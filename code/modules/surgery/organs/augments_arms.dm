@@ -414,63 +414,115 @@
 	icon = 'icons/obj/power.dmi'
 	icon_state = "wire1"
 	flags = NOBLUDGEON
+	new_attack_chain = TRUE
 	var/drawing_power = FALSE
+	var/mode_switchable = FALSE
+	var/charge_apc_mode = FALSE
 
-/obj/item/apc_powercord/afterattack__legacy__attackchain(atom/target, mob/user, proximity_flag, click_parameters)
-	if(!istype(target, /obj/machinery/power/apc) || !ishuman(user) || !proximity_flag)
-		return ..()
+/obj/item/apc_powercord/activate_self(mob/user)
+	if(..())
+		return FINISH_ATTACK
+
+	if(!mode_switchable)
+		return FINISH_ATTACK
+
+	if(drawing_power)
+		to_chat(user, "<span class='warning'>You cannot change the mode of \the [src] while it is in use!</span>")
+		return FINISH_ATTACK
+
+	if(charge_apc_mode)
+		to_chat(user, "<span class='notice'>You switch \the [src] to drawing mode, allowing you to charge yourself.</span>")
+		charge_apc_mode = FALSE
+	else
+		to_chat(user, "<span class='notice'>You switch \the [src] to sending power, allowing you to charge APCs.</span>")
+		charge_apc_mode = TRUE
+
+/obj/item/apc_powercord/proc/handle_apc_interaction(mob/living/carbon/user, obj/machinery/power/apc/target)
 	if(drawing_power)
 		to_chat(user, "<span class='warning'>You're already charging.</span>")
 		return
 	user.changeNext_move(CLICK_CD_MELEE)
-	var/obj/machinery/power/apc/A = target
 	var/mob/living/carbon/human/H = user
 	var/datum/organ/battery/power_source = H.get_int_organ_datum(ORGAN_DATUM_BATTERY)
 	var/obj/item/organ/internal/cell/battery = H.get_int_organ(/obj/item/organ/internal/cell)
 	if(istype(power_source))
-		if(A.emagged || A.stat & BROKEN)
+		if((target.emagged || target.stat & BROKEN))
 			var/obj/item/organ/internal/cell/overvoltageproof/proofed_battery = battery
 			if(!istype(battery, /obj/item/organ/internal/cell/overvoltageproof) || proofed_battery.protection_inactive)
-				do_sparks(3, 1, A)
+				do_sparks(3, 1, target)
 				to_chat(H, "<span class='warning'>The APC power currents surge erratically, damaging your chassis!</span>")
 				H.adjustFireLoss(10,0)
 			else
-				do_sparks(3, 1, A)
-				to_chat(H, "<span class='warning'>The APC power currents surge erratically, but your overvoltage-proofed microbattery spares you from damage!</span>")
-		else if(A.cell && A.cell.charge > 0)
-			if(H.nutrition >= NUTRITION_LEVEL_WELL_FED)
-				to_chat(user, "<span class='warning'>You are already fully charged!</span>")
+				do_sparks(3, 1, target)
+				to_chat(H, "<span class='warning'>The APC power currents surge erratically, but your overvoltage-proofed microbattery protects you from damage!</span>")
+		else if(target.cell)
+			if(!charge_apc_mode)
+				if(target.cell.charge == 0)
+					to_chat(user, "<span class='warning'>There is no charge to draw from that APC.</span>")
+				else if(H.nutrition >= NUTRITION_LEVEL_WELL_FED)
+					to_chat(user, "<span class='warning'>You are already fully charged!</span>")
+				else
+					INVOKE_ASYNC(src, PROC_REF(powerdraw_loop), target, H)
 			else
-				INVOKE_ASYNC(src, PROC_REF(powerdraw_loop), A, H)
-		else
-			to_chat(user, "<span class='warning'>There is no charge to draw from that APC.</span>")
+				if(H.nutrition <= NUTRITION_LEVEL_STARVING)
+					to_chat(user, "<span class='warning'>You are too low on charge to send power.</span>")
+				else if(target.cell.charge == target.cell.maxcharge)
+					to_chat(user, "<span class='warning'>\The [target] is already fully charged!</span>")
+				else
+					INVOKE_ASYNC(src, PROC_REF(powersend_loop), target, H)
 	else
-		to_chat(user, "<span class='warning'>You lack a power source in which to store charge!</span>")
+		to_chat(user, "<span class='warning'>You lack a power source in which to store or draw charge!</span>")
 
-/obj/item/apc_powercord/proc/powerdraw_loop(obj/machinery/power/apc/A, mob/living/carbon/human/H)
-	H.visible_message("<span class='notice'>[H] inserts a power connector into \the [A].</span>", "<span class='notice'>You begin to draw power from \the [A].</span>")
+/obj/item/apc_powercord/proc/powerdraw_loop(obj/machinery/power/apc/target, mob/living/carbon/human/H)
+	H.visible_message("<span class='notice'>[H] inserts a power connector into \the [target].</span>", "<span class='notice'>You begin to draw power from \the [target].</span>")
 	drawing_power = TRUE
-	while(do_after(H, 10, target = A))
+	while(do_after(H, 10, target = target))
 		if(loc != H)
 			to_chat(H, "<span class='warning'>You must keep your connector out while charging!</span>")
 			break
-		if(A.cell.charge == 0)
-			to_chat(H, "<span class='warning'>\The [A] has no more charge.</span>")
+		if(target.cell.charge == 0)
+			to_chat(H, "<span class='warning'>\The [target] has no more charge.</span>")
 			break
-		A.charging = APC_IS_CHARGING
-		if(A.cell.charge >= 500)
+		target.charging = APC_IS_CHARGING
+		if(target.cell.charge >= 500)
 			H.adjust_nutrition(50)
-			A.cell.charge -= 500
+			target.cell.charge -= 500
 			to_chat(H, "<span class='notice'>You siphon off some of the stored charge for your own use.</span>")
 		else
-			H.adjust_nutrition(A.cell.charge * 0.1)
-			A.cell.charge = 0
-			to_chat(H, "<span class='notice'>You siphon off the last of \the [A]'s charge.</span>")
+			H.adjust_nutrition(target.cell.charge * 0.1)
+			target.cell.charge = 0
+			to_chat(H, "<span class='notice'>You siphon off the last of \the [target]'s charge.</span>")
 			break
 		if(H.nutrition > NUTRITION_LEVEL_WELL_FED)
 			to_chat(H, "<span class='notice'>You are now fully charged.</span>")
 			break
-	H.visible_message("<span class='notice'>[H] unplugs from \the [A].</span>", "<span class='notice'>You unplug from \the [A].</span>")
+	H.visible_message("<span class='notice'>[H] unplugs from \the [target].</span>", "<span class='notice'>You unplug from \the [target].</span>")
+	drawing_power = FALSE
+
+/obj/item/apc_powercord/proc/powersend_loop(obj/machinery/power/apc/target, mob/living/carbon/human/H)
+	H.visible_message("<span class='notice'>[H] inserts a power connector into \the [target].</span>", "<span class='notice'>You begin to charge \the [target].</span>")
+	drawing_power = TRUE
+	while(do_after(H, 10, target = target))
+		if(loc != H)
+			to_chat(H, "<span class='warning'>You must keep your connector out while charging!</span>")
+			break
+		if(H.nutrition <= NUTRITION_LEVEL_STARVING)
+			to_chat(H, "<span class='warning'>You feel too drained to continue charging \the [target]!</span>")
+			break
+		target.charging = APC_IS_CHARGING
+		if(H.nutrition >= (NUTRITION_LEVEL_STARVING + 50))
+			target.cell.charge += 500
+			H.adjust_nutrition(-50)
+			to_chat(H, "<span class='notice'>You siphon some of some of your own energy to charge \the [target].</span>")
+		else
+			target.cell.charge += 500
+			H.adjust_nutrition(-50)
+			to_chat(H, "<span class='notice'>You finish charging \the [target], feeling very drained.</span>")
+			break
+		if(target.cell.charge == target.cell.maxcharge)
+			to_chat(H, "<span class='notice'>\The [target] is fully charged!</span>")
+			break
+	H.visible_message("<span class='notice'>[H] unplugs from \the [target].</span>", "<span class='notice'>You unplug from \the [target].</span>")
 	drawing_power = FALSE
 
 /obj/item/organ/internal/cyberimp/arm/power_cord/twoway
@@ -482,91 +534,7 @@
 /obj/item/apc_powercord/twoway
 	name = "two-way power cable"
 	desc = "A cable capable of both drawing power from and sending power to an APC."
-	icon = 'icons/obj/power.dmi'
-	icon_state = "wire1"
-	flags = NOBLUDGEON
-	/// If false, we are drawing power. If true, we are giving power.
-	var/inverted = FALSE
-
-/obj/item/apc_powercord/twoway/activate_self(mob/user)
-	if(..())
-		return
-
-	if(drawing_power)
-		to_chat(user, "<span class='warning'>We cannot change the mode of \the [src] while it is in use!</span>")
-		return
-
-	if(inverted)
-		to_chat(user, "<span class='notice'>We switch \the [src] to drawing power, allowing us to charge ourself.</span>")
-		inverted = FALSE
-	else
-		to_chat(user, "<span class='notice'>We switch \the [src] to sending power, allowing us to charge APCs.</span>")
-		inverted = FALSE
-
-/obj/item/apc_powercord/twoway/after_attack(atom/target, mob/user, proximity_flag, click_parameters)
-	if(!istype(target, /obj/machinery/power/apc) || !ishuman(user) || !proximity_flag)
-		return ..()
-	if(drawing_power)
-		to_chat(user, "<span class='warning'>You're already charging.</span>")
-		return
-	user.changeNext_move(CLICK_CD_MELEE)
-	var/obj/machinery/power/apc/A = target
-	var/mob/living/carbon/human/H = user
-	var/datum/organ/battery/power_source = H.get_int_organ_datum(ORGAN_DATUM_BATTERY)
-	var/obj/item/organ/internal/cell/battery = H.get_int_organ(/obj/item/organ/internal/cell)
-	if(istype(power_source))
-		if((A.emagged || A.stat & BROKEN))
-			var/obj/item/organ/internal/cell/overvoltageproof/proofed_battery = battery
-			if(!istype(battery, /obj/item/organ/internal/cell/overvoltageproof) || proofed_battery.protection_inactive)
-				do_sparks(3, 1, A)
-				to_chat(H, "<span class='warning'>The APC power currents surge erratically, damaging your chassis!</span>")
-				H.adjustFireLoss(10,0)
-			else
-				do_sparks(3, 1, A)
-				to_chat(H, "<span class='warning'>The APC power currents surge erratically, but your overvoltage-proofed microbattery spares you from damage!</span>")
-		else if(A.cell)
-			if(!inverted)
-				if(A.cell.charge > 0)
-					to_chat(user, "<span class='warning'>There is no charge to draw from that APC.</span>")
-				else if(H.nutrition >= NUTRITION_LEVEL_WELL_FED)
-					to_chat(user, "<span class='warning'>You are already fully charged!</span>")
-				else
-					INVOKE_ASYNC(src, PROC_REF(powerdraw_loop), A, H)
-			else
-				if(H.nutrition <= NUTRITION_LEVEL_STARVING)
-					to_chat(user, "<span class='warning'>You are too low on charge to send power.</span>")
-				else if(A.cell.charge < A.cell.maxcharge)
-					to_chat(user, "<span class='warning'>\The [A] is already fully charged!</span>")
-				else
-					INVOKE_ASYNC(src, PROC_REF(powersend_loop), A, H)
-	else
-		to_chat(user, "<span class='warning'>You lack a power source in which to store or draw charge!</span>")
-
-/obj/item/apc_powercord/proc/powersend_loop(obj/machinery/power/apc/A, mob/living/carbon/human/H)
-	H.visible_message("<span class='notice'>[H] inserts a power connector into \the [A].</span>", "<span class='notice'>You begin to draw power from \the [A].</span>")
-	drawing_power = TRUE
-	while(do_after(H, 10, target = A))
-		if(loc != H)
-			to_chat(H, "<span class='warning'>You must keep your connector out while charging!</span>")
-			break
-		if(H.nutrition <= NUTRITION_LEVEL_STARVING)
-			to_chat(H, "<span class='warning'>You feel too drained to continue charging \the [A]!</span>")
-			break
-		A.charging = APC_IS_CHARGING
-		if(H.nutrition >= (NUTRITION_LEVEL_STARVING + 50))
-			A.cell.charge += 500
-			H.adjust_nutrition(-50)
-			to_chat(H, "<span class='notice'>You siphon some of some of your own energy to charge \the [A].</span>")
-		else
-			A.cell.charge += 500
-			H.adjust_nutrition(-50)
-			to_chat(H, "<span class='notice'>You finish charging \the [A], feeling very drained.</span>")
-			break
-		if(A.cell.charge == A.cell.maxcharge)
-			to_chat(H, "<span class='notice'>\The [A] is fully charged!</span>")
-			break
-	H.visible_message("<span class='notice'>[H] unplugs from \the [A].</span>", "<span class='notice'>You unplug from \the [A].</span>")
-	drawing_power = FALSE
+	mode_switchable = TRUE
 
 /obj/item/organ/internal/cyberimp/arm/telebaton
 	name = "telebaton implant"
